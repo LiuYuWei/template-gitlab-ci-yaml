@@ -1,0 +1,11 @@
+.pylint:
+    variables:
+      TEST_DOCKER_NAME: pytest-pipeline
+      IMAGE_PYTEST_NAME: openvino/ubuntu18_runtime
+    script:
+      - docker run -u root 
+                 -v "$PWD":/home/app/workdir
+                 -w /home/app/workdir
+                 -e PROJECT_PATH=$PROJECT_DIR
+                 --name $TEST_DOCKER_NAME $IMAGE_PYTEST_NAME /bin/bash 
+                 -c "pip3 install -r requirements-test.txt && pytest -q -p no:warnings --cov-config=tests/.coveragerc --cov=. --cov-report term-missing -o log_cli=true --capture=no tests/"
