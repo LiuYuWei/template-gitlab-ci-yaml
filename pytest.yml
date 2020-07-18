@@ -1,7 +1,7 @@
 .pylint:
     variables:
       TEST_DOCKER_NAME: pytest-pipeline
-      IMAGE_PYTEST_NAME: openvino/ubuntu18_runtime
+      IMAGE_PYTEST_NAME: ubuntu18
     script:
       - docker run -u root 
                  -v "$PWD":/home/app/workdir
