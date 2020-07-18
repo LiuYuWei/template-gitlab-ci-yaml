@@ -1,0 +1,18 @@
+.pylint:
+    variables:
+        MIN_SCORE : 8.0
+    script:
+        - docker run -u root 
+                        -v "$(pwd)":/home/app/workdir 
+                        -w /home/app/workdir 
+                        --name pylint ubuntu /bin/bash 
+                        -c "pip3 install pylint==2.4.4 && find . -iname '*.py' | xargs pylint --rcfile=/home/app/workdir/config/ci_pipeline/pylint.conf | tee pylint.log"
+        - pylint_score=$(sed -n 's/^Your code has been rated at \([-0-9.]*\)\/.*/\1/p' pylint.log) && rm pylint.log
+        - docker run --rm -v $(pwd):/code -w "/code" linedwell/anybadge anybadge --value=$pylint_score --file=pylint.svg --label Pylint
+        - if [ `echo $pylint_score | awk -v MIN_SCORE=$MIN_SCORE '{print($pylint_score>=MIN_SCORE)? "1":"0"}'` -eq "0" ]; then echo "Pylint score = $pylint_score is under than $MIN_SCORE" && exit 1; else echo "Successfully pass the pylint static test." && exit 0; fi    
+    artifacts:
+        when: always
+        paths: 
+            - pylint.svg
+        expire_in: 1 week
+  
